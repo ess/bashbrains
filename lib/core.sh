@@ -13,10 +13,27 @@
 #      REVISION:  ---
 #===============================================================================
 
+#-------------------------------------------------------------------------------
+#  Setup
+#-------------------------------------------------------------------------------
+
+[ -f '/etc/bashbrainsrc' ] && . /etc/bashbrainsrc
+[ -f "${HOME}/.bashbrainsrc" ] && . "${HOME}/.bashbrainsrc"
+
+#-------------------------------------------------------------------------------
+#  Globals
+#-------------------------------------------------------------------------------
+
 BRAINS_WGET=${BRAINS_WGET:-"wget -q -t 1 --timeout=5 -O -"}
-BRAINS_LIB_SEARCH_PATHS="${BRAINS_LIB_SEARCH_PATHS} /usr/lib/bashbrains /usr/share/bashbrains /usr/local/lib/bashbrains /usr/local/lp/share/bashbrains"
+BRAINS_PREFIX=${BRAINS_PREFIX:-'/usr/local/lib/bashbrains'}
+BRAINS_MODULE_DIR=${BRAINS_MODULE_DIR:-"${BRAINS_PREFIX}/brains"}
+BRAINS_LIB_SEARCH_PATHS="${BRAINS_LIB_SEARCH_PATHS} ${BRAINS_MODULE_DIR}" 
 BRAINS_SCRIPT_NAME=${BRAINS_SCRIPT_NAME:-"Unnamed Script"} # Should be overridden.
 BRAINS_GZFILTER="gzip -d -f"
+
+#-------------------------------------------------------------------------------
+#  Standard Library Methods
+#-------------------------------------------------------------------------------
 
 die() {
   echo -e "${BRAINS_SCRIPT_NAME} error: ${1}" 1>&2
@@ -51,6 +68,10 @@ source_remote() {
   unset rawHttpSource
 }
 
+#-------------------------------------------------------------------------------
+#  Brains Interface Methods
+#-------------------------------------------------------------------------------
+
 register_script_name() {
   defined "${1}" || die "register_script_name - No script name given."
   BRAINS_SCRIPT_NAME="${1}"
@@ -60,6 +81,7 @@ register_brains_uri() {
   defined "${1}" || die 'register_brains_uri - No URI given.'
   echo "${1}" | egrep -i '^(http|ftp)://' >/dev/null 2>&1 ||
   die 'register_brains_uri - Only HTTP and FTP are supported.'
+  BRAINS_URI=${1}
 }
 
 add_brains_library_path() {
@@ -67,6 +89,10 @@ add_brains_library_path() {
   is_directory "${1}" || die "add_brains_library_path - '${1}' does not exist or is not a directory."
   BRAINS_LIB_SEARCH_PATHS="${1} ${BRAINS_LIB_SEARCH_PATHS}"
 }
+
+#-------------------------------------------------------------------------------
+#  Internal Methods
+#-------------------------------------------------------------------------------
 
 find_module_path() {
   defined "${1}" || die "find_module_path - No module given."
@@ -78,35 +104,34 @@ find_module_path() {
   done
 }
 
-load_brains_modules() {
-  [ $# -gt 0 ] || die 'load_brains_modules - No module names given.'
+load_brains_module() {
+  [ $# -gt 0 ] || die 'load_brains_module - No module names given.'
 
-  while [ $# -gt 0 ]
-  do
-    local brainsModule="${1}"
-    if ! module_is_loaded "${brainsModule}"
+  local brainsModule="${1}"
+  if ! module_is_loaded "${brainsModule}"
+  then
+    local modFile=$( find_module_path "${brainsModule}")/${brainsModule}.sh
+    if is_file "${modFile}" 
     then
-      local modFile=$( find_module_path "${brainsModule}")/${brainsModule}.sh
-      if is_file "${modFile}" 
-        source "${modFile}"
-      elif defined "${BRAINS_URI}" && source_remote "${BRAINS_URI}/${brainsModule}.sh"
-      else
-        die "load_brains_modules - Module '${1}' not found."
-      fi
+      source "${modFile}"
+    elif defined "${BRAINS_URI}"
+    then
+      source_remote "${BRAINS_URI}/${brainsModule}.sh"
+    else
+      die "load_brains_modules - Module '${1}' not found."
     fi
-    shift
-  done
+  fi
 }
 
 module_to_env() {
   defined "${1}" || die "module_to_env - No module name given."
   local brainsModule="${1}"
-  echo "BRAINS_MODULE_$( echo "${brainsModule}" | tr a-z A-Z)"
+  echo "BRAINS_MODULE_$( echo "${1}" | tr a-z A-Z)"
 }
 
 module_is_loaded() {
   defined "${1}" || die "module_is_loaded - No module name given."
-  local brainsModule=$( module_to_env "${1}" )
+  local brainsModule="$( module_to_env "${1}" )"
   defined "${!brainsModule}"
 }
 
@@ -114,13 +139,21 @@ file_from_uri() {
   echo "${1}" | awk -F/ '{print $NF}'
 }
 
+#-------------------------------------------------------------------------------
+#  "Public" Methods
+#-------------------------------------------------------------------------------
+
 source() {
   if is_file "${1}"
   then
     . "${1}" && return 0 || die "'${1}' could not be sourced."
   fi
 
-  load_brains_modules "${1}"
+  load_brains_module "${1}"
 }
+
+#-------------------------------------------------------------------------------
+#  Core Module Signature
+#-------------------------------------------------------------------------------
 
 BRAINS_MODULE_CORE=1
