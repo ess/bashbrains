@@ -1,0 +1,32 @@
+Bash Brains
+A Bash Library (and Eventually Management System for Such)
+http://github.com/ess/bashbrains
+
+INSTALLATION
+============
+
+install.brains.sh
+
+If you would like to specify a prefix, simply do so as follows:
+
+PREFIX=/path/to/whatever install.brains.sh
+
+USAGE
+=====
+
+For the moment, the only command available with the brains utility is "core,"
+which returns the full location of the brains core include file.
+
+To use bash brains in your scripts, you need to source the core include:
+
+source "$( brains core )"
+
+You can now use any of the methods that are defined in the brains core, and you
+can also source other brains:
+
+source 'time'
+source 'file'
+
+The default behavior for the "source" command is to directly source the given
+file.  If the given path does not exist, the brains library path is then searched
+and the brains module in question is loaded if present.
