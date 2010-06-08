@@ -2,6 +2,16 @@ Bash Brains
 A Bash Library (and Eventually Management System for Such)
 http://github.com/ess/bashbrains
 
+PURPOSE
+=======
+
+To fulfill the requests that my employer has made of me in recent months, I've
+been writing a ton of bash scripts.  Almost invariably, I've been re-using a
+ton of general-purpose methods (several of which are included with bash brains),
+and It's occurred to me that this would all be a lot easier if we had the
+same mechanism for bash that Ruby and Perl have in (respectively) gems and
+CPAN.
+
 INSTALLATION
 ============
 
@@ -17,7 +27,9 @@ USAGE
 For the moment, the only command available with the brains utility is "core,"
 which returns the full location of the brains core include file.
 
-To use bash brains in your scripts, you need to source the core include:
+To use bash brains in your scripts, you need to source the core include.
+Since the location of the core include file is not necessarily known, one
+may use the above "core" facility to source it:
 
 source "$( brains core )"
 
@@ -28,5 +40,9 @@ source 'time'
 source 'file'
 
 The default behavior for the "source" command is to directly source the given
-file.  If the given path does not exist, the brains library path is then searched
-and the brains module in question is loaded if present.
+file.  If the given path does not exist, the brains library path is then
+searched, and the brains module in question is loaded if present.
+
+Eventually, the brains utility will provide a listing of both installed and
+remote brains packages as well as a mechanism by which to install and remove
+said packages.  Really.  It's in the TODO file.
