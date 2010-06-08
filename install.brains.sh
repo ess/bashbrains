@@ -32,4 +32,3 @@ install -m644 lib/core.sh ${BRAINS_PREFIX}/core.sh
 install -m644 lib/core/time.sh ${BRAINS_PREFIX}/core/time.sh
 install -m644 lib/core/string.sh ${BRAINS_PREFIX}/core/string.sh
 install -m644 lib/core/file.sh ${BRAINS_PREFIX}/core/file.sh
-install -m644 lib/brains/locknload.sh ${BRAINS_PREFIX}/brains/locknload.sh
