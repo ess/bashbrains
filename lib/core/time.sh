@@ -1,11 +1,11 @@
 #!/bin/bash - 
 #===============================================================================
 #
-#          FILE:  file.sh
+#          FILE:  time.sh
 # 
 #   DESCRIPTION:  
 # 
-#  REQUIREMENTS:  brains-core, brains-string, brains-time, coreutils
+#  REQUIREMENTS:  brains-core-string
 #          BUGS:  ---
 #         NOTES:  ---
 #        AUTHOR:  Ess (ess), pooster@gmail.com 
@@ -31,37 +31,10 @@
 #  along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 
-source 'string'
-source 'time'
+source 'core/string'
 
-file_age() {
-  local currentTime="$( time_now )"
-  local fileCtime="$( strip_whitespace "$( stat -c "%Z" "${1}" )" )"
-
-  strip_whitespace "$( expr "${currentTime}" - "${fileCtime}" )"
+time_now() {
+  strip_whitespace "$( date +"%s" )"
 }
 
-file_size() {
-  strip_whitespace "$( stat -c "%s" "${1}" )"
-}
-
-is_readable() {
-  [ -r "${1}" ]
-}
-
-is_writable() {
-  [ -w "${1}" ]
-}
-
-is_executable() {
-  [ -x "${1}" ]
-}
-
-create_dir() {
-  defined "${1}" || die "create_dir - No path given."
-
-  mkdir -p "${1}" || die "create_dir - Could not create '${1}'"
-}
-
-BRAINS_MODULE_FILE=1
-
+BRAINS_MODULE_CORE_TIME=1

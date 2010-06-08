@@ -45,4 +45,4 @@ to_lower() {
   echo "$1" | tr A-Z a-z
 }
 
-BRAINS_MODULE_STRING=1
+BRAINS_MODULE_CORE_STRING=1
