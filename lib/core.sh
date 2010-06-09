@@ -143,8 +143,8 @@ load_brains_module() {
 
 module_to_env() {
   defined "${1}" || die "module_to_env - No module name given."
-  local brainsModule="${1}"
-  echo "BRAINS_MODULE_$( echo "${1}" | tr a-z A-Z)"
+  local brainsModule="$( echo "${1}" | sed -e 's/\//_/g' )"
+  echo "BRAINS_MODULE_$( echo "${brainsModule}" | tr a-z A-Z)"
 }
 
 module_is_loaded() {

@@ -38,7 +38,7 @@ file_age() {
   local currentTime="$( time_now )"
   local fileCtime="$( strip_whitespace "$( stat -c "%Z" "${1}" )" )"
 
-  strip_whitespace "$( expr "${currentTime}" - "${fileCtime}" )"
+  strip_whitespace "$(( currentTime - fileCtime ))"
 }
 
 file_size() {
