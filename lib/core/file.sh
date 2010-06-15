@@ -63,5 +63,9 @@ create_dir() {
   mkdir -p "${1}" || die "create_dir - Could not create '${1}'"
 }
 
+directory_is_populated() {
+  ls "${1}"/* >/dev/null 2>&1
+}
+
 BRAINS_MODULE_CORE_FILE=1
 
